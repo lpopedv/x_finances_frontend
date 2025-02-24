@@ -3,6 +3,7 @@ import { Loader } from "lucide-react";
 import { useState } from "react";
 import { TransactionsForm } from "../components/transactions-form";
 import { Transaction } from "../schemas/transaction";
+import { formatPriceInReais } from "../utils";
 
 export const Transactions = () => {
 
@@ -71,7 +72,7 @@ export const Transactions = () => {
               <td>{transaction.category?.title}</td>
               <td>{transaction.title}</td>
               <td>{transaction.movement}</td>
-              <td>{transaction.valueInCents}</td>
+              <td>{formatPriceInReais(transaction.valueInCents)}</td>
               <td>{}</td>
               <td>{transaction.isFixed ? 'Sim' : 'Não'}</td>
               <td>{transaction.isPaid ? 'Sim' : 'Não'}</td>
