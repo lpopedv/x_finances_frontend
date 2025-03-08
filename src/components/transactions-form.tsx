@@ -1,9 +1,18 @@
 import { useForm } from "react-hook-form";
+import { format } from "date-fns"
 import { Transaction, transactionZodSchema } from "../schemas/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "../schemas/category";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Switch } from "./ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { CalendarIcon, Calendar } from "lucide-react";
+import { cn } from "~/lib/utils";
 
 interface TransactionsFormProps {
   transaction: Transaction | null;
@@ -11,8 +20,17 @@ interface TransactionsFormProps {
 }
 
 export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProps) => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<Transaction>({
-    resolver: zodResolver(transactionZodSchema)
+  const form = useForm<Transaction>({
+    resolver: zodResolver(transactionZodSchema),
+    defaultValues: {
+      categoryId: transaction?.categoryId ?? 0,
+      title: transaction?.title ?? '',
+      movement: transaction?.movement ?? 'outgoing',
+      valueInCents: transaction?.valueInCents ?? 0,
+      date: transaction?.date ?? new Date().toISOString(),
+      isFixed: transaction?.isFixed ?? false,
+      isPaid: transaction?.isPaid ?? false,
+    }
   });
 
   const { data: categoriesSelect } = useQuery({
@@ -20,18 +38,19 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
     queryFn: getCategories
   });
 
-
   useEffect(() => {
     if (transaction) {
-      setValue("categoryId", transaction.categoryId);
-      setValue("title", transaction.title);
-      setValue("movement", transaction.movement);
-      setValue("valueInCents", transaction.valueInCents);
-      setValue("date", transaction.date);
-      setValue("isFixed", transaction.isFixed);
-      setValue("isPaid", transaction.isPaid);
+      form.reset({
+        categoryId: transaction.categoryId,
+        title: transaction.title,
+        movement: transaction.movement,
+        valueInCents: transaction.valueInCents,
+        date: transaction.date,
+        isFixed: transaction.isFixed,
+        isPaid: transaction.isPaid,
+      });
     }
-  }, [transaction, setValue])
+  }, [transaction, form]);
 
   const handleSubmitForm = (data: Transaction) => {
     if (transaction) {
@@ -39,60 +58,219 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
     } else {
       onSubmit(data);
     }
-
-    setValue('categoryId', 0);
-    setValue('title', '');
-    setValue('movement', 'outgoing');
-    setValue('valueInCents', 0);
-    setValue('isFixed', false);
-    setValue('isPaid', false);
+    form.reset({
+      categoryId: 0,
+      title: '',
+      movement: 'outgoing',
+      valueInCents: 0,
+      date: '',
+      isFixed: false,
+      isPaid: false,
+    });
   };
 
-  console.log(categoriesSelect)
+  useEffect(() => {
+    if (categoriesSelect?.length > 0 && !transaction && form.getValues('categoryId') === 0) {
+      form.setValue('categoryId', categoriesSelect[0].id);
+    }
+  }, [categoriesSelect, form, transaction]);
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm)}>
-      <label htmlFor="categoryId">Categoria</label>
-      <select id="categoryId" {...register('categoryId')}>
-  {categoriesSelect?.map((category: Category) => (
-    <option key={category.id} value={category.id}>{category.title}</option>
-  ))}
-</select>
-      {errors.categoryId && <span>{errors.categoryId.message}</span>}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmitForm)} className="flex gap-8 border p-4 rounded-4xl items-center">
 
-      <label htmlFor="title">Título</label>
-      <input type="text" id="title" {...register('title')} />
-      {errors.title && <span>{errors.title.message}</span>}
+        <div className="flex flex-col gap-2">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Título: <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="Título da transação" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <label htmlFor="movement">Movimento</label>
-      <select id="movement" {...register('movement')}>
-        <option value="income">Entrada</option>
-        <option value="outgoing">Saída</option>
-      </select>
-      {errors.movement && <span>{errors.movement.message}</
-      span>}
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria: <span className="text-red-500">*</span> </FormLabel>
+                <Select
+                  onValueChange={(value) => field.onChange(Number(value))}
+                  value={field.value.toString()} // Substitua defaultValue por value
+                >
+                  <FormControl className="w-full">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categoriesSelect?.map((category: Category) => (
+                      <SelectItem key={category.id} value={category?.id?.toString() as string}>
+                        {category.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
+        <div className="flex gap-2 flex-col">
+          <FormField
+            control={form.control}
+            name="movement"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Movimento: <span className="text-red-500">*</span></FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl className="w-full">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o movimento" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="income">Entrada</SelectItem>
+                    <SelectItem value="outgoing">Saída</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <label htmlFor="valueInCents">Valor</label>
-      <input type="number" id="valueInCents" {...register('valueInCents')} />
-      {errors.valueInCents && <span>{errors.valueInCents.message}</span>}
+          <FormField
+            control={form.control}
+            name="valueInCents"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Valor: <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Valor em centavos"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-      <label htmlFor="date">Data</label>
-      <input type="date" id="date" {...register('date')} />
-      {errors.date && <span>{errors.date.message}</span>}
+        <div className="flex flex-col gap-4" >
+          <FormField
+            control={form.control}
+            name="isFixed"
+            render={({ field }) => (
+              <FormItem className="flex gap-2 mt-6">
+                <FormControl>
 
-      <label htmlFor="isFixed">É fixo?</label>
-      <input type="checkbox" id="isFixed" {...register('isFixed')} />
-      {errors.isFixed && <span>{errors.isFixed.message}</span>}
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>É fixo?</FormLabel>
+                  <FormDescription>
+                    Marque se essa transação é fixa
+                  </FormDescription>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <label htmlFor="isPaid">Está pago?</label>
-      <input type="checkbox" id="isPaid" {...register('isPaid')} />
-      {errors.isPaid && <span>{errors.isPaid.message}</span>}
+          <FormField
+            control={form.control}
+            name="isPaid"
+            render={({ field }) => (
+              <FormItem className="flex gap-2 mt-5">
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Está pago?</FormLabel>
+                  <FormDescription>
+                    Marque se ela já foi paga
+                  </FormDescription>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <button type="submit">{transaction ? 'Salvar alterações' : 'Criar transação'}</button>
-    </form>
-  )
-}
+        </div>
+
+        <div>
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Data:</FormLabel>
+                <FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+                <FormDescription>Data em que foi realizada</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button type="submit">
+          {transaction ? 'Salvar alterações' : 'Criar transação'}
+        </Button>
+      </form>
+    </Form>
+  );
+};
 
 const getCategories = async () => {
   const response = await fetch('http://localhost:3333/categories');
