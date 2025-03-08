@@ -1,7 +1,8 @@
 import { Calendar, Home, Inbox } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "./ui/sidebar"
 import { Link } from "react-router-dom"
 import { ModeToggle } from "./mode-toggle"
+import { cn } from "~/lib/utils"
 
 const items = [
   {
@@ -21,7 +22,10 @@ const items = [
   },
 ]
 
+
 export function AppSidebar() {
+  const { state } = useSidebar()
+
   return (
     <Sidebar variant="floating" side="left" collapsible="icon">
       <SidebarContent>
@@ -44,7 +48,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <ModeToggle />
+        <div className={cn("flex gap-2 justify-between", state === "collapsed" ? "flex-col" : "flex-row")}>
+          <ModeToggle />
+          <SidebarTrigger />
+        </div>
       </SidebarFooter>
     </Sidebar>
   )

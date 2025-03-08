@@ -85,7 +85,6 @@ function SidebarProvider({
     },
     [setOpenProp, open]
   )
-
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
@@ -259,9 +258,9 @@ function SidebarTrigger({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="ghost"
+      variant="outline"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("bg-transparent", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
