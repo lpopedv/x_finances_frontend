@@ -23,10 +23,10 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar variant="floating" side="left">
+    <Sidebar variant="floating" side="left" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>xFinances</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
