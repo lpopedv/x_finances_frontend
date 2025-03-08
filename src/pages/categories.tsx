@@ -1,8 +1,19 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
-import { CategoriesForm } from "../components/categories-form";
-import { Category } from "../schemas/category";
 import { useState } from "react";
+import { CategoriesForm } from "~/components/categories-form";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table"
+import { Category } from "~/schemas/category";
 
 export const Categories = () => {
   const { data: categories, isLoading, refetch } = useQuery({
@@ -43,34 +54,31 @@ export const Categories = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <CategoriesForm
         category={editingCategory}
         onSubmit={handleFormSubmit}
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Descrição</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories?.map((category: Category) => (
-            <tr key={category.id}>
-              <td>{category.id}</td>
-              <td>{category.title}</td>
-              <td>{category.description}</td>
-              <td>
-                <button onClick={() => handleEdit(category)}>Editar</button>
-              </td>
-            </tr>
+      <Table>
+        <TableCaption>Categorias</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">ID</TableHead>
+            <TableHead>Título</TableHead>
+            <TableHead>Descrição</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {categories.map((category: Category) => (
+            <TableRow key={category.id}>
+              <TableCell className="font-medium">{category.id}</TableCell>
+              <TableCell>{category.title}</TableCell>
+              <TableCell>{category.description}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
