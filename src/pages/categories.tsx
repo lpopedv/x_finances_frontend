@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader } from "lucide-react";
+import { FilePen, Loader } from "lucide-react";
 import { useState } from "react";
 import { CategoriesForm } from "~/components/categories-form";
+import { Button } from "~/components/ui/button";
 
 import {
   Table,
@@ -76,7 +77,10 @@ export const Categories = () => {
               <TableCell>{category.title}</TableCell>
               <TableCell>{category.description}</TableCell>
               <TableCell>
-                <button onClick={() => handleEdit(category)}>Editar</button>
+                <Button variant={'outline'} size={'icon'} className="cursor-pointer" onClick={() => handleEdit(category)}>
+                  <FilePen />
+                </Button>
+
               </TableCell>
             </TableRow>
           ))}
