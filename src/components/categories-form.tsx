@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Category, categoryZodSchema } from "../schemas/category";
-import { useEffect } from "react";
 
 interface CategoriesFormProps {
   category: Category | null;
@@ -10,15 +9,12 @@ interface CategoriesFormProps {
 
 export const CategoriesForm = ({ category, onSubmit }: CategoriesFormProps) => {
   const { register, handleSubmit, setValue } = useForm<Category>({
-    resolver: zodResolver(categoryZodSchema)
-  });
-
-  useEffect(() => {
-    if (category) {
-      setValue("title", category.title);
-      setValue("description", category.description);
+    resolver: zodResolver(categoryZodSchema),
+    defaultValues: {
+      title: category?.title ?? '',
+      description: category?.description ?? ''
     }
-  }, [category, setValue]);
+  });
 
   const handleSubmitForm = (data: Category) => {
     if (category) {
@@ -26,9 +22,6 @@ export const CategoriesForm = ({ category, onSubmit }: CategoriesFormProps) => {
     } else {
       onSubmit(data);
     }
-
-    setValue('title', '');
-    setValue('description', '');
   };
 
   return (

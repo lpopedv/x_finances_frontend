@@ -1,18 +1,22 @@
 import { Outlet } from "react-router-dom"
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
 import { AppSidebar } from "./components/app-sidebar"
+import { ThemeProvider } from "./components/theme-provider"
 
 export const Layout = () => {
   return (
     <>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarTrigger />
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarTrigger />
 
-        <main className="w-full m-6">
-          <Outlet />
-        </main>
-      </SidebarProvider>
+          <main className="w-full m-6">
+            <Outlet />
+          </main>
+
+        </SidebarProvider>
+      </ThemeProvider>
     </>
   )
 }

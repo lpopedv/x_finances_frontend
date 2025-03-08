@@ -1,6 +1,7 @@
 import { Calendar, Home, Inbox } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
 import { Link } from "react-router-dom"
+import { ModeToggle } from "./mode-toggle"
 
 const items = [
   {
@@ -42,6 +43,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <ModeToggle />
+      </SidebarFooter>
     </Sidebar>
   )
 }
