@@ -8,7 +8,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -67,6 +66,7 @@ export const Categories = () => {
             <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>Título</TableHead>
             <TableHead>Descrição</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -75,6 +75,9 @@ export const Categories = () => {
               <TableCell className="font-medium">{category.id}</TableCell>
               <TableCell>{category.title}</TableCell>
               <TableCell>{category.description}</TableCell>
+              <TableCell>
+                <button onClick={() => handleEdit(category)}>Editar</button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
