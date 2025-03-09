@@ -1,20 +1,77 @@
 import { useQuery } from "@tanstack/react-query"
 import { formatPriceInReais } from "../utils"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
+import { Minus } from "lucide-react"
+import { ExpensesByCategoryChart } from "~/components/expenses-by-category-chart"
 
 export const Dashboard = () => {
-
   const { data: dashboardData } = useQuery({
     queryKey: ['getDashboardData'],
     queryFn: getDashboardData
   })
 
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-4">
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-1">
+                <CardTitle>Despesas Fixas</CardTitle>
+                <CardDescription>Total de despesas fixas</CardDescription>
+              </div>
+
+              <div>
+                <Minus className="text-red-500" />
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalFixedExpenses)}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-1">
+                <CardTitle>Despesas Atuais</CardTitle>
+                <CardDescription>Despesas realizadas esse mês</CardDescription>
+              </div>
+
+              <div>
+                <Minus className="text-red-500" />
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-lg font-semibold">{formatPriceInReais(0)}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-1">
+                <CardTitle>Despesas para o próximo mês</CardTitle>
+                <CardDescription>Despesas previstas para o mês que vem</CardDescription>
+              </div>
+
+              <div>
+                <Minus className="text-red-500" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg font-semibold">{formatPriceInReais(0)}</p>
+          </CardContent>
+        </Card>
+      </div>
 
       <div>
-        <p>Dívidas recorrentes</p>
-        <p>{formatPriceInReais(dashboardData?.totalFixedExpenses)}</p>
+        <ExpensesByCategoryChart />
       </div>
     </div>
   )
