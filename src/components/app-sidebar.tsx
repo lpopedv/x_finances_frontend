@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Calendar, Home, Inbox, Paperclip } from "lucide-react"
+import { ArrowRightLeft, Home, Paperclip } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "./ui/sidebar"
 import { Link } from "react-router-dom"
 import { ModeToggle } from "./mode-toggle"
