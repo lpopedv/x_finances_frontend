@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { Card } from "~/components/ui/card";
 
 export const Transactions = () => {
   const { data: transactions, isLoading, refetch } = useQuery({
@@ -62,52 +63,55 @@ export const Transactions = () => {
         onSubmit={handleFormSubmit}
       />
 
-      <Table>
-        <TableCaption>Transações</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Categoria</TableHead>
-            <TableHead>Título</TableHead>
-            <TableHead>Movimento</TableHead>
-            <TableHead>Valor</TableHead>
-            <TableHead>Data</TableHead>
-            <TableHead>Fixa</TableHead>
-            <TableHead>Paga</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions?.map((transaction: Transaction) => (
-            <TableRow key={transaction.id}>
-              <TableCell className="font-medium">{transaction.id}</TableCell>
-              <TableCell>{transaction.category?.title}</TableCell>
-              <TableCell>{transaction.title}</TableCell>
-              <TableCell>{transaction.movement}</TableCell>
-              <TableCell>
-                {formatPriceInReais(transaction.valueInCents)}
-              </TableCell>
-              <TableCell>
-                {transaction.date
-                  ? new Date(transaction.date).toLocaleDateString()
-                  : ""}
-              </TableCell>
-              <TableCell>{transaction.isFixed ? "Sim" : "Não"}</TableCell>
-              <TableCell>{transaction.isPaid ? "Sim" : "Não"}</TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit(transaction)}
-                  className="cursor-pointer"
-                >
-                  <FilePen />
-                </Button>
-              </TableCell>
+      <Card className="p-4">
+        <Table>
+          <TableCaption>Transações</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Movimento</TableHead>
+              <TableHead>Valor</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Fixa</TableHead>
+              <TableHead>Paga</TableHead>
+              <TableHead>Ações</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {transactions?.map((transaction: Transaction) => (
+              <TableRow key={transaction.id}>
+                <TableCell className="font-medium">{transaction.id}</TableCell>
+                <TableCell>{transaction.category?.title}</TableCell>
+                <TableCell>{transaction.title}</TableCell>
+                <TableCell>{transaction.movement}</TableCell>
+                <TableCell>
+                  {formatPriceInReais(transaction.valueInCents)}
+                </TableCell>
+                <TableCell>
+                  {transaction.date
+                    ? new Date(transaction.date).toLocaleDateString()
+                    : ""}
+                </TableCell>
+                <TableCell>{transaction.isFixed ? "Sim" : "Não"}</TableCell>
+                <TableCell>{transaction.isPaid ? "Sim" : "Não"}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleEdit(transaction)}
+                    className="cursor-pointer"
+                  >
+                    <FilePen />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+
     </div>
   );
 };

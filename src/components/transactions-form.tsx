@@ -13,6 +13,7 @@ import { Switch } from "./ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CalendarIcon, Calendar } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { Card } from "./ui/card";
 
 interface TransactionsFormProps {
   transaction: Transaction | null;
@@ -76,199 +77,203 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
   }, [categoriesSelect, form, transaction]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmitForm)} className="flex gap-8 border p-4 rounded-4xl items-center">
+    <Card>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="flex gap-8 p-4 rounded-4xl items-center">
 
-        <div className="flex flex-col gap-2">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Título: <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="Título da transação" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Categoria: <span className="text-red-500">*</span> </FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(Number(value))}
-                  value={field.value.toString()} // Substitua defaultValue por value
-                >
-                  <FormControl className="w-full">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria" />
-                    </SelectTrigger>
+          <div className="flex flex-col gap-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título: <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder="Título da transação" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    {categoriesSelect?.map((category: Category) => (
-                      <SelectItem key={category.id} value={category?.id?.toString() as string}>
-                        {category.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex gap-2 flex-col">
-          <FormField
-            control={form.control}
-            name="movement"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Movimento: <span className="text-red-500">*</span></FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl className="w-full">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o movimento" />
-                    </SelectTrigger>
+            <FormField
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria: <span className="text-red-500">*</span> </FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={field.value.toString()} // Substitua defaultValue por value
+                  >
+                    <FormControl className="w-full">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categoriesSelect?.map((category: Category) => (
+                        <SelectItem key={category.id} value={category?.id?.toString() as string}>
+                          {category.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex gap-2 flex-col">
+            <FormField
+              control={form.control}
+              name="movement"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Movimento: <span className="text-red-500">*</span></FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl className="w-full">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o movimento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="income">Entrada</SelectItem>
+                      <SelectItem value="outgoing">Saída</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="valueInCents"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor: <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Valor em centavos"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="income">Entrada</SelectItem>
-                    <SelectItem value="outgoing">Saída</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="valueInCents"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Valor: <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Valor em centavos"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div className="flex flex-col gap-4" >
+            <FormField
+              control={form.control}
+              name="isFixed"
+              render={({ field }) => (
+                <FormItem className="flex gap-2 mt-6">
+                  <FormControl>
 
-        <div className="flex flex-col gap-4" >
-          <FormField
-            control={form.control}
-            name="isFixed"
-            render={({ field }) => (
-              <FormItem className="flex gap-2 mt-6">
-                <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>É fixo?</FormLabel>
+                    <FormDescription>
+                      Marque se essa transação é fixa
+                    </FormDescription>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>É fixo?</FormLabel>
-                  <FormDescription>
-                    Marque se essa transação é fixa
-                  </FormDescription>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="isPaid"
+              render={({ field }) => (
+                <FormItem className="flex gap-2 mt-5">
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Está pago?</FormLabel>
+                    <FormDescription>
+                      Marque se ela já foi paga
+                    </FormDescription>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="isPaid"
-            render={({ field }) => (
-              <FormItem className="flex gap-2 mt-5">
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Está pago?</FormLabel>
-                  <FormDescription>
-                    Marque se ela já foi paga
-                  </FormDescription>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          </div>
 
-        </div>
+          <div>
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Data:</FormLabel>
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                  <FormDescription>Data em que foi realizada</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <div>
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Data:</FormLabel>
-                <FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                <FormDescription>Data em que foi realizada</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <Button type="submit">
+            {transaction ? 'Salvar alterações' : 'Criar transação'}
+          </Button>
+        </form>
+      </Form>
 
-        <Button type="submit">
-          {transaction ? 'Salvar alterações' : 'Criar transação'}
-        </Button>
-      </form>
-    </Form>
+
+    </Card>
   );
 };
 
