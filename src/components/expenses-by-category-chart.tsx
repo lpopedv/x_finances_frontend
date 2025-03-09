@@ -62,12 +62,22 @@ export function ExpensesByCategoryChart() {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="spent" fill="var(--color-desktop)" radius={8}>
+
+            <Bar dataKey="spent" fill={'var(--chart-1)'} radius={8}>
+
               <LabelList
                 position="top"
                 offset={12}
                 className="fill-foreground"
                 fontSize={12}
+                formatter={(value: number) => {
+                  const valorEmReais = value / 100;
+                  return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(valorEmReais);
+                }
+                }
               />
             </Bar>
           </BarChart>
