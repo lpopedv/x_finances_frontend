@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox } from "lucide-react"
+import { ArrowRightLeft, Calendar, Home, Inbox, Paperclip } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "./ui/sidebar"
 import { Link } from "react-router-dom"
 import { ModeToggle } from "./mode-toggle"
@@ -13,12 +13,12 @@ const items = [
   {
     title: "Categorias",
     url: "/categories",
-    icon: Inbox,
+    icon: Paperclip,
   },
   {
     title: "Transações",
     url: "/transactions",
-    icon: Calendar,
+    icon: ArrowRightLeft,
   },
 ]
 
