@@ -1,20 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { FilePen, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useState } from "react";
 import { CategoriesForm } from "~/components/categories-form";
-import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table"
 import { Category } from "~/schemas/category";
+import { CategoryDataTable } from "./data-table";
+import { categoriesColumns } from "./columns";
 
 export const Categories = () => {
   const { data: categories, isLoading, refetch } = useQuery({
@@ -62,33 +54,7 @@ export const Categories = () => {
       />
 
       <Card className="p-4">
-        <Table>
-          <TableCaption>Categorias</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead>Título</TableHead>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories.map((category: Category) => (
-              <TableRow key={category.id}>
-                <TableCell className="font-medium">{category.id}</TableCell>
-                <TableCell>{category.title}</TableCell>
-                <TableCell>{category.description}</TableCell>
-                <TableCell>
-                  <Button variant={'outline'} size={'icon'} className="cursor-pointer bg-transparent" onClick={() => handleEdit(category)}>
-                    <FilePen />
-                  </Button>
-
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
+        <CategoryDataTable data={categories} columns={categoriesColumns} />
       </Card>
     </div>
   );

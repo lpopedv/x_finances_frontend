@@ -1,8 +1,8 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom"
 import { Dashboard } from "./pages/dashboard"
-import { Categories } from "./pages/categories"
-import { Transactions } from "./pages/transactions"
 import { Layout } from "./layout"
+import { Categories } from "./pages/categories/categories"
+import { Transactions } from "./pages/transactions/transactions"
 
 function App() {
   return (
