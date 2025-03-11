@@ -22,7 +22,7 @@ export const Dashboard = () => {
               </div>
 
               <div>
-                <Minus className="text-red-500" />
+                <Minus className="text-[#8c78ba]" />
               </div>
             </div>
           </CardHeader>
@@ -41,7 +41,7 @@ export const Dashboard = () => {
               </div>
 
               <div>
-                <Minus className="text-red-500" />
+                <Minus className="text-[#8c78ba]" />
               </div>
             </div>
           </CardHeader>
@@ -60,7 +60,7 @@ export const Dashboard = () => {
               </div>
 
               <div>
-                <Minus className="text-red-500" />
+                <Minus className="text-[#8c78ba]" />
               </div>
             </div>
           </CardHeader>

@@ -266,7 +266,7 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
             />
           </div>
 
-          <Button type="submit">
+          <Button className="bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer" type="submit">
             {transaction ? 'Salvar alterações' : 'Criar transação'}
           </Button>
         </form>

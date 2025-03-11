@@ -71,7 +71,7 @@ export const CategoriesForm = ({ category, onSubmit }: CategoriesFormProps) => {
             )}
           />
 
-          <Button type="submit" >
+          <Button type="submit" className="bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer" >
             {category ? 'Salvar alterações' : 'Criar categoria'}
           </Button>
         </form>

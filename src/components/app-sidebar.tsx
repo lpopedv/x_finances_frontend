@@ -37,7 +37,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link to={item.url} >
-                      <item.icon />
+                      <item.icon className="text-[#8c78ba]" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
