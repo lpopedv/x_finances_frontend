@@ -3,32 +3,33 @@ import { format } from "date-fns"
 import { Transaction, transactionZodSchema } from "../schemas/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Category } from "../schemas/category";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Switch } from "./ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, Calendar } from "lucide-react";
+import { CalendarIcon, Pencil } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { Card } from "./ui/card";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { Calendar } from "./ui/calendar";
 
 interface TransactionsFormProps {
-  transaction: Transaction | null;
-  onSubmit: (transaction: Transaction) => void;
+  transaction?: Transaction
 }
 
-export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProps) => {
+export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
   const form = useForm<Transaction>({
     resolver: zodResolver(transactionZodSchema),
     defaultValues: {
+      id: transaction?.id,
       categoryId: transaction?.categoryId ?? 0,
       title: transaction?.title ?? '',
       movement: transaction?.movement ?? 'outgoing',
       valueInCents: transaction?.valueInCents ?? 0,
-      date: transaction?.date ?? new Date().toISOString(),
+      date: transaction?.date ?? new Date(),
       isFixed: transaction?.isFixed ?? false,
       isPaid: transaction?.isPaid ?? false,
     }
@@ -39,36 +40,7 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
     queryFn: getCategories
   });
 
-  useEffect(() => {
-    if (transaction) {
-      form.reset({
-        categoryId: transaction.categoryId,
-        title: transaction.title,
-        movement: transaction.movement,
-        valueInCents: transaction.valueInCents,
-        date: transaction.date,
-        isFixed: transaction.isFixed,
-        isPaid: transaction.isPaid,
-      });
-    }
-  }, [transaction, form]);
-
-  const handleSubmitForm = (data: Transaction) => {
-    if (transaction) {
-      onSubmit({ ...data, id: transaction.id });
-    } else {
-      onSubmit(data);
-    }
-    form.reset({
-      categoryId: 0,
-      title: '',
-      movement: 'outgoing',
-      valueInCents: 0,
-      date: '',
-      isFixed: false,
-      isPaid: false,
-    });
-  };
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (categoriesSelect?.length > 0 && !transaction && form.getValues('categoryId') === 0) {
@@ -76,12 +48,48 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
     }
   }, [categoriesSelect, form, transaction]);
 
-  return (
-    <Card>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="flex gap-8 p-4 rounded-4xl items-center">
+  const createTransactionMutation = useMutation({
+    mutationFn: createTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listTransactions"] })
+    },
+  });
 
-          <div className="flex flex-col gap-2">
+  const updateTransactionMutation = useMutation({
+    mutationFn: updateTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listTransactions"] })
+    },
+  });
+
+  const handleFormSubmit = (transaction: Transaction) => {
+
+
+    if (transaction.id !== undefined) {
+      console.log('updatada')
+      updateTransactionMutation.mutate(transaction);
+    } else {
+
+      console.log('creada')
+      createTransactionMutation.mutate(transaction);
+    }
+  };
+
+  const editingMode = transaction?.id !== undefined
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant={'ghost'} className={editingMode ? 'cursor-pointer' : 'bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer'} >{editingMode ? <Pencil className="text-[#8c78ba]" /> : 'Criar'}</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{editingMode ? `Editando: ${transaction.title}` : 'Crie uma transação'}</SheetTitle>
+        </SheetHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="p-4 flex flex-col gap-6">
+
             <FormField
               control={form.control}
               name="title"
@@ -104,7 +112,7 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
                   <FormLabel>Categoria: <span className="text-red-500">*</span> </FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(Number(value))}
-                    value={field.value.toString()} // Substitua defaultValue por value
+                    value={field.value.toString()}
                   >
                     <FormControl className="w-full">
                       <SelectTrigger>
@@ -123,9 +131,7 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="flex gap-2 flex-col">
             <FormField
               control={form.control}
               name="movement"
@@ -169,78 +175,70 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="flex flex-col gap-4" >
-            <FormField
-              control={form.control}
-              name="isFixed"
-              render={({ field }) => (
-                <FormItem className="flex gap-2 mt-6">
-                  <FormControl>
+            <div className="flex gap-12 mx-auto items-center" >
+              <FormField
+                control={form.control}
+                name="isFixed"
+                render={({ field }) => (
+                  <FormItem className="flex gap-2 mt-6">
+                    <FormControl>
 
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>É fixo?</FormLabel>
-                    <FormDescription>
-                      Marque se essa transação é fixa
-                    </FormDescription>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Transação fixa</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="isPaid"
-              render={({ field }) => (
-                <FormItem className="flex gap-2 mt-5">
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Está pago?</FormLabel>
-                    <FormDescription>
-                      Marque se ela já foi paga
-                    </FormDescription>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="isPaid"
+                render={({ field }) => (
+                  <FormItem className="flex gap-2 mt-5">
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Transação paga</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          </div>
+            </div>
 
-          <div>
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Data:</FormLabel>
-                  <FormControl>
+            <div>
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Data:</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (
                               format(field.value, "PPP")
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Selecione uma data</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -251,29 +249,25 @@ export const TransactionsForm = ({ transaction, onSubmit }: TransactionsFormProp
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
                           initialFocus
                         />
                       </PopoverContent>
                     </Popover>
-                  </FormControl>
-                  <FormDescription>Data em que foi realizada</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <SheetClose asChild>
+              <Button className="bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer" type="submit">
+                {transaction ? 'Salvar alterações' : 'Criar transação'}
+              </Button>
 
-          <Button className="bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer" type="submit">
-            {transaction ? 'Salvar alterações' : 'Criar transação'}
-          </Button>
-        </form>
-      </Form>
-
-
-    </Card>
+            </SheetClose>
+          </form>
+        </Form>
+      </SheetContent>
+    </Sheet >
   );
 };
 
@@ -281,3 +275,26 @@ const getCategories = async () => {
   const response = await fetch('http://localhost:3333/categories');
   return await response.json();
 };
+
+const createTransaction = async (transaction: Transaction) => {
+  const response = await fetch("http://localhost:3333/transactions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(transaction),
+  });
+  return await response.json();
+};
+
+const updateTransaction = async (transaction: Transaction) => {
+  const response = await fetch(`http://localhost:3333/transactions`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(transaction),
+  });
+  return await response.json();
+};
+

@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Minus, Plus } from "lucide-react"
+import { TransactionsForm } from "~/components/transactions-form"
 import { Transaction } from "~/schemas/transaction"
 import { formatPriceInReais } from "~/utils"
 
@@ -21,7 +22,16 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
     accessorKey: "movement",
     header: "Movimentação",
 
-    cell: ({ row }) => row.original.movement === "outgoing" ? <Minus className="text-[#8c78ba]" /> : <Plus className="text-[#8c78ba]" />
+    cell: ({ row }) => {
+      const movementIcon = row.original.movement === "outgoing" ? <Minus className="text-[#8c78ba]" /> : <Plus className="text-[#8c78ba]" />
+
+      return (
+        <div className="ml-8">
+          {movementIcon}
+        </div>
+      )
+
+    }
   },
   {
     accessorKey: "valueInCents",
@@ -30,6 +40,10 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: 'actions',
-    header: 'Ações'
+    header: 'Ações',
+    cell: ({ row }) => {
+      const transaction = row.original
+      return <TransactionsForm transaction={transaction} />
+    },
   },
 ]

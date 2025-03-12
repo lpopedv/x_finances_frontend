@@ -1,63 +1,33 @@
-
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Loader } from "lucide-react";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { TransactionsForm } from "~/components/transactions-form";
-import { Transaction } from "~/schemas/transaction";
 import { Card } from "~/components/ui/card";
 import { TransactionsDataTable } from "./data-table";
 import { transactionsColumns } from "./columns";
+import { Loader2 } from "lucide-react";
 
 export const Transactions = () => {
-  const { data: transactions, isLoading, refetch } = useQuery({
+  const { data: transactions, isLoading } = useQuery({
     queryKey: ["listTransactions"],
     queryFn: getTransactions,
   });
 
-  const [editingTransaction, setEditingTransaction] =
-    useState<Transaction | null>(null);
-
-  const createTransactionMutation = useMutation({
-    mutationFn: createTransaction,
-    onSuccess: () => {
-      refetch();
-      setEditingTransaction(null);
-    },
-  });
-
-  const updateTransactionMutation = useMutation({
-    mutationFn: updateTransaction,
-    onSuccess: () => {
-      refetch();
-      setEditingTransaction(null);
-    },
-  });
-
-  const handleEdit = (transaction: Transaction) => {
-    setEditingTransaction(transaction);
-  };
-
-  const handleFormSubmit = (transaction: Transaction) => {
-    if (transaction.id) {
-      updateTransactionMutation.mutate(transaction);
-    } else {
-      createTransactionMutation.mutate(transaction);
-    }
-  };
-
-  if (isLoading) return <Loader />;
-
-  console.log(transactions)
+  const allTransactions = transactions ?? []
 
   return (
-    <div className="flex flex-col gap-6">
-      <TransactionsForm
-        transaction={editingTransaction}
-        onSubmit={handleFormSubmit}
-      />
+    <div className="flex flex-col items-end gap-6">
+      <TransactionsForm />
 
-      <Card className="p-4">
-        <TransactionsDataTable columns={transactionsColumns} data={transactions} />
+      <Card className="p-4 w-full">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+            <span className="ml-2 text-gray-500">Carregando...</span>
+          </div>
+        ) : allTransactions?.length > 0 ? (
+          <TransactionsDataTable columns={transactionsColumns} data={transactions ?? []} />
+        ) : (
+          <p className="text-center text-gray-500">Nenhuma transação encontrada.</p>
+        )}
       </Card>
     </div>
   );
@@ -65,28 +35,8 @@ export const Transactions = () => {
 
 const getTransactions = async () => {
   const response = await fetch("http://localhost:3333/transactions");
-  return await response.json();
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 };
 
-const createTransaction = async (transaction: Transaction) => {
-  const response = await fetch("http://localhost:3333/transactions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(transaction),
-  });
-  return await response.json();
-};
-
-const updateTransaction = async (transaction: Transaction) => {
-  const response = await fetch(`http://localhost:3333/transactions`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(transaction),
-  });
-  return await response.json();
-};
 
