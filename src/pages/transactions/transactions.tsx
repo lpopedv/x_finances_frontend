@@ -4,11 +4,12 @@ import { Card } from "~/components/ui/card";
 import { TransactionsDataTable } from "./data-table";
 import { transactionsColumns } from "./columns";
 import { Loader2 } from "lucide-react";
+import { TransactionRequests } from "~/requests/transactions-request";
 
 export const Transactions = () => {
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["listTransactions"],
-    queryFn: getTransactions,
+    queryFn: TransactionRequests.getAllTransactionsData,
   });
 
   const allTransactions = transactions ?? []
@@ -31,12 +32,6 @@ export const Transactions = () => {
       </Card>
     </div>
   );
-};
-
-const getTransactions = async () => {
-  const response = await fetch("http://localhost:3333/transactions");
-  const data = await response.json();
-  return Array.isArray(data) ? data : [];
 };
 
 

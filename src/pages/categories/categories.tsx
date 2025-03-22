@@ -7,17 +7,18 @@ import { Card } from "~/components/ui/card";
 import { Category } from "~/schemas/category";
 import { CategoryDataTable } from "./data-table";
 import { categoriesColumns } from "./columns";
+import { CategoryRequests } from "~/requests/categories-request";
 
 export const Categories = () => {
   const { data: categories, isLoading, refetch } = useQuery({
     queryKey: ['listCategories'],
-    queryFn: getCategories
+    queryFn: CategoryRequests.getAllCategoriesData
   });
 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const createCategoryMutation = useMutation({
-    mutationFn: createCategory,
+    mutationFn: CategoryRequests.createCategory,
     onSuccess: () => {
       refetch();
       setEditingCategory(null);
@@ -25,16 +26,12 @@ export const Categories = () => {
   });
 
   const updateCategoryMutation = useMutation({
-    mutationFn: updateCategory,
+    mutationFn: CategoryRequests.updateCategory,
     onSuccess: () => {
       refetch();
       setEditingCategory(null);
     }
   });
-
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
-  };
 
   const handleFormSubmit = (category: Category) => {
     if (category.id) {
@@ -60,29 +57,4 @@ export const Categories = () => {
   );
 };
 
-const getCategories = async () => {
-  const response = await fetch('http://localhost:3333/categories');
-  return await response.json();
-};
 
-const createCategory = async (category: Category) => {
-  const response = await fetch('http://localhost:3333/categories', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(category)
-  });
-  return await response.json();
-};
-
-const updateCategory = async (category: Category) => {
-  const response = await fetch(`http://localhost:3333/categories/${category.id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(category)
-  });
-  return await response.json();
-};

@@ -11,10 +11,12 @@ import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Switch } from "./ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, Pencil, X, XIcon } from "lucide-react";
+import { CalendarIcon, Pencil } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Calendar } from "./ui/calendar";
+import { TransactionRequests } from "~/requests/transactions-request";
+import { CategoryRequests } from "~/requests/categories-request";
 
 interface TransactionsFormProps {
   transaction?: Transaction
@@ -25,46 +27,45 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
     resolver: zodResolver(transactionZodSchema),
     defaultValues: {
       id: transaction?.id,
-      categoryId: transaction?.categoryId ?? 0,
+      category_id: transaction?.category_id ?? 0,
       title: transaction?.title ?? '',
       movement: transaction?.movement ?? 'outgoing',
-      valueInCents: transaction?.valueInCents ?? 0,
+      value_in_cents: transaction?.value_in_cents ?? 0,
       date: transaction?.date ? new Date(transaction.date) : undefined,
-      dueDate: transaction?.dueDate ? new Date(transaction.dueDate) : undefined,
-      isFixed: transaction?.isFixed ?? false,
-      isPaid: transaction?.isPaid ?? false,
+      due_date: transaction?.due_date ? new Date(transaction.due_date) : undefined,
+      is_fixed: transaction?.is_fixed ?? false,
+      is_paid: transaction?.is_paid ?? false,
     }
   });
 
   const { data: categoriesSelect } = useQuery({
     queryKey: ['categoriesSelect'],
-    queryFn: getCategories
+    queryFn: CategoryRequests.getAllCategoriesData
   });
 
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (categoriesSelect?.length > 0 && !transaction && form.getValues('categoryId') === 0) {
-      form.setValue('categoryId', categoriesSelect[0].id);
+    if (categoriesSelect?.length > 0 && !transaction && form.getValues('category_id') === 0) {
+      form.setValue('category_id', categoriesSelect[0].id);
     }
   }, [categoriesSelect, form, transaction]);
 
   const createTransactionMutation = useMutation({
-    mutationFn: createTransaction,
+    mutationFn: TransactionRequests.createTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listTransactions"] })
     },
   });
 
   const updateTransactionMutation = useMutation({
-    mutationFn: updateTransaction,
+    mutationFn: TransactionRequests.updateTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listTransactions"] })
     },
   });
 
   const handleFormSubmit = (transaction: Transaction) => {
-    console.log(transaction)
     if (transaction.id !== undefined) {
       updateTransactionMutation.mutate(transaction);
     } else {
@@ -101,15 +102,16 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
               )}
             />
 
+
             <FormField
               control={form.control}
-              name="categoryId"
+              name="category_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoria: <span className="text-red-500">*</span> </FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(Number(value))}
-                    value={field.value.toString()}
+                    onValueChange={(value) => field.onChange(value)}
+                    value={`${field.value}`}
                   >
                     <FormControl className="w-full">
                       <SelectTrigger>
@@ -118,7 +120,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
                     </FormControl>
                     <SelectContent>
                       {categoriesSelect?.map((category: Category) => (
-                        <SelectItem key={category.id} value={category?.id?.toString() as string}>
+                        <SelectItem key={category.id} value={`${category.id}`}>
                           {category.title}
                         </SelectItem>
                       ))}
@@ -128,6 +130,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
                 </FormItem>
               )}
             />
+
 
             <FormField
               control={form.control}
@@ -156,7 +159,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
 
             <FormField
               control={form.control}
-              name="valueInCents"
+              name="value_in_cents"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Valor: <span className="text-red-500">*</span></FormLabel>
@@ -176,7 +179,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
             <div className="flex gap-12 mx-auto items-center" >
               <FormField
                 control={form.control}
-                name="isFixed"
+                name="is_fixed"
                 render={({ field }) => (
                   <FormItem className="flex gap-2 mt-6">
                     <FormControl>
@@ -196,7 +199,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
 
               <FormField
                 control={form.control}
-                name="isPaid"
+                name="is_paid"
                 render={({ field }) => (
                   <FormItem className="flex gap-2 mt-5">
                     <FormControl>
@@ -254,7 +257,7 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
 
               <FormField
                 control={form.control}
-                name="dueDate"
+                name="due_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col w-full">
                     <FormLabel>Data de vencimento:</FormLabel>
@@ -308,30 +311,6 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
   );
 };
 
-const getCategories = async () => {
-  const response = await fetch('http://localhost:3333/categories');
-  return await response.json();
-};
 
-const createTransaction = async (transaction: Transaction) => {
-  const response = await fetch("http://localhost:3333/transactions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(transaction),
-  });
-  return await response.json();
-};
 
-const updateTransaction = async (transaction: Transaction) => {
-  const response = await fetch(`http://localhost:3333/transactions`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(transaction),
-  });
-  return await response.json();
-};
 

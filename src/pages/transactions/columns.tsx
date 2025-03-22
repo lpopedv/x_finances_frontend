@@ -16,7 +16,7 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "category",
     header: "Categoria",
-    cell: ({ row }) => row.original.category?.title ?? ''
+    cell: ({ row }) => row.original.category_id
   },
   {
     accessorKey: "movement",
@@ -34,9 +34,9 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
     }
   },
   {
-    accessorKey: "valueInCents",
+    accessorKey: "value_in_cents",
     header: "Valor",
-    cell: ({ row }) => formatPriceInReais(row.original.valueInCents)
+    cell: ({ row }) => formatPriceInReais(row.original.value_in_cents)
   },
   {
     accessorKey: 'actions',
