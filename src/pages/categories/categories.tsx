@@ -29,7 +29,7 @@ export const Categories = () => {
         ) : allCategories?.length > 0 ? (
           <CategoryDataTable columns={categoriesColumns} data={allCategories} />
         ) : (
-          <p className="text-center text-gray-500">Nenhuma transação encontrada.</p>
+          <p className="text-center text-gray-500">Nenhuma categoria encontrada.</p>
         )}
       </Card>
     </div>
