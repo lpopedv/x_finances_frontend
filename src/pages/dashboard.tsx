@@ -68,7 +68,7 @@ export const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(data?.next_month_expeses)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(data?.fixed_expenses + data?.next_month_expeses)}</p>
           </CardContent>
         </Card>
       </div>
