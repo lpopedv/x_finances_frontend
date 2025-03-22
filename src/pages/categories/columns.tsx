@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
+import { CategoriesForm } from "~/components/categories-form"
 import { Category } from "~/schemas/category"
 
 export const categoriesColumns: ColumnDef<Category>[] = [
@@ -16,6 +17,10 @@ export const categoriesColumns: ColumnDef<Category>[] = [
   },
   {
     accessorKey: 'actions',
-    header: 'Ações'
+    header: 'Ações',
+    cell: ({ row }) => {
+      const category = row.original
+      return <CategoriesForm category={category} />
+    },
   },
 ]
