@@ -3,12 +3,15 @@ import { formatPriceInReais } from "../utils"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import { Minus } from "lucide-react"
 import { ExpensesByCategoryChart } from "~/components/expenses-by-category-chart"
+import { DashboardRequests } from "~/requests/chart"
 
 export const Dashboard = () => {
   const { data: dashboardData } = useQuery({
     queryKey: ['getDashboardData'],
-    queryFn: getDashboardData
+    queryFn: DashboardRequests.getDashboardData
   })
+
+  const data = dashboardData?.dashboard_data
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,7 +31,7 @@ export const Dashboard = () => {
           </CardHeader>
 
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalFixedExpenses)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(data?.fixed_expenses)}</p>
           </CardContent>
         </Card>
 
@@ -47,7 +50,7 @@ export const Dashboard = () => {
           </CardHeader>
 
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalMonthlyExpenses)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(data?.monthly_expenses)}</p>
           </CardContent>
         </Card>
 
@@ -65,7 +68,7 @@ export const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalNextMonthExpenses)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(data?.next_month_expeses)}</p>
           </CardContent>
         </Card>
       </div>
@@ -77,13 +80,3 @@ export const Dashboard = () => {
   )
 }
 
-const getDashboardData = async () => {
-  const response = await fetch(`http://localhost:3333/dashboard-data`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-
-  return await response.json()
-}

@@ -1,8 +1,16 @@
-const getChartsData = async () => {
-  const response = await fetch('http://localhost:3333/charts-data');
-  return await response.json();
+import { env } from "~/env";
+
+const getDashboardData = async () => {
+  const response = await fetch(`${env.VITE_API_ENDPOINT}/dashboard_data`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+
+  return await response.json()
 }
 
-export const ChartRequests = {
-  getChartsData
+export const DashboardRequests = {
+  getDashboardData
 }

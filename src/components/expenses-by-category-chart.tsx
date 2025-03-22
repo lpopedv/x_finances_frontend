@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
@@ -17,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart"
-import { ChartRequests } from "~/requests/chart"
+import { DashboardRequests } from "~/requests/chart"
 
 const chartConfig = {
   spent: {
@@ -27,12 +26,13 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ExpensesByCategoryChart() {
-  const { data: chartsData } = useQuery({
+  const { data: dashboardData } = useQuery({
     queryKey: ['getChartsData'],
-    queryFn: ChartRequests.getChartsData
+    queryFn: DashboardRequests.getDashboardData
   });
 
-  const chartData = chartsData?.spentsByCategory ?? []
+  const spentsByCategory = dashboardData?.dashboard_data?.charts?.spents_by_category
+  const chartData = spentsByCategory
 
   return (
     <Card>
