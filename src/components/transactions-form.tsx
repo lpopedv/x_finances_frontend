@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns"
 import { Transaction, transactionZodSchema } from "../schemas/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Category } from "../schemas/category";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
@@ -42,6 +42,53 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
     queryKey: ['categoriesSelect'],
     queryFn: CategoryRequests.getAllCategoriesData
   });
+
+  const [rawValue, setRawValue] = useState('')
+
+  useEffect(() => {
+    if (transaction?.value_in_cents) {
+      const initialValue = (transaction.value_in_cents / 100).toFixed(2)
+      setRawValue(initialValue)
+    }
+  }, [transaction])
+
+  const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
+    value = value.replace(/\D/g, '')
+    value = value.replace(/^0+/, '')
+
+    if (value.length === 0) {
+      setRawValue('')
+      form.setValue('value_in_cents', 0)
+      return
+    }
+
+    const paddedValue = value.padStart(3, '0')
+    const cents = parseInt(paddedValue.slice(0, -2) + paddedValue.slice(-2), 10)
+    form.setValue('value_in_cents', cents)
+
+    const formatted = (cents / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
+
+    setRawValue(formatted)
+  }
+
+  const handleCurrencyBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (!value) {
+      setRawValue('R$ 0,00')
+      form.setValue('value_in_cents', 0)
+      return
+    }
+  }
+
+  const handleCurrencyFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.select()
+    const value = e.target.value.replace(/\D/g, '')
+    setRawValue(value || '')
+  }
 
   const queryClient = useQueryClient()
 
@@ -160,15 +207,19 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
             <FormField
               control={form.control}
               name="value_in_cents"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Valor: <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      placeholder="Valor em centavos"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      type="text"
+                      placeholder="R$ 0,00"
+                      value={rawValue}
+                      onChange={handleCurrencyChange}
+                      onBlur={handleCurrencyBlur}
+                      onFocus={handleCurrencyFocus}
+                      inputMode="numeric"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </FormControl>
                   <FormMessage />
