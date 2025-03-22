@@ -8,7 +8,8 @@ export const transactionZodSchema = z.object({
   title: z.string(),
   movement: z.enum(['income', 'outgoing']),
   valueInCents: z.coerce.number(),
-  date: z.date().optional(),
+  date: z.coerce.date().optional(),
+  dueDate: z.coerce.date().optional(),
   isFixed: z.boolean().default(false),
   isPaid: z.boolean().default(false)
 })

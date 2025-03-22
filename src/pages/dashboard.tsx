@@ -36,7 +36,7 @@ export const Dashboard = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div className="flex flex-col gap-1">
-                <CardTitle>Despesas Atuais</CardTitle>
+                <CardTitle>Despesas Mensais</CardTitle>
                 <CardDescription>Despesas realizadas esse mês</CardDescription>
               </div>
 
@@ -47,7 +47,7 @@ export const Dashboard = () => {
           </CardHeader>
 
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(0)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalMonthlyExpenses)}</p>
           </CardContent>
         </Card>
 
@@ -65,7 +65,7 @@ export const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{formatPriceInReais(0)}</p>
+            <p className="text-lg font-semibold">{formatPriceInReais(dashboardData?.totalNextMonthExpenses)}</p>
           </CardContent>
         </Card>
       </div>

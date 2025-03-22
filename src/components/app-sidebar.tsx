@@ -50,7 +50,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <div className={cn("flex gap-2 justify-between", state === "collapsed" ? "flex-col" : "flex-row")}>
           <ModeToggle />
-          <SidebarTrigger />
+          <SidebarTrigger className="text-[#8c78ba] hover:text-[#8c78ba] cursor-pointer" />
         </div>
       </SidebarFooter>
     </Sidebar>

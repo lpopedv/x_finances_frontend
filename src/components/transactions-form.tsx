@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Switch } from "./ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, Pencil } from "lucide-react";
+import { CalendarIcon, Pencil, X, XIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Calendar } from "./ui/calendar";
@@ -29,7 +29,8 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
       title: transaction?.title ?? '',
       movement: transaction?.movement ?? 'outgoing',
       valueInCents: transaction?.valueInCents ?? 0,
-      date: transaction?.date ?? new Date(),
+      date: transaction?.date ? new Date(transaction.date) : undefined,
+      dueDate: transaction?.dueDate ? new Date(transaction.dueDate) : undefined,
       isFixed: transaction?.isFixed ?? false,
       isPaid: transaction?.isPaid ?? false,
     }
@@ -63,14 +64,10 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
   });
 
   const handleFormSubmit = (transaction: Transaction) => {
-
-
+    console.log(transaction)
     if (transaction.id !== undefined) {
-      console.log('updatada')
       updateTransactionMutation.mutate(transaction);
     } else {
-
-      console.log('creada')
       createTransactionMutation.mutate(transaction);
     }
   };
@@ -218,46 +215,86 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
 
             </div>
 
-            <div>
+            <div className="flex flex-col gap-4 justify-between">
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data:</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Selecione uma data</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                  <FormItem className="flex flex-col w-full">
+                    <FormLabel>Data da transação:</FormLabel>
+                    <div className="flex items-center">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn("pl-3 text-left font-normal flex-1", !field.value && "text-muted-foreground")}
+                            >
+
+                              {field.value ? format(field.value, "PPP") : <span>Selecione uma data</span>}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col w-full">
+                    <FormLabel>Data de vencimento:</FormLabel>
+                    <div className="flex items-center">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'pl-3 text-left font-normal flex-1',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, 'PPP')
+                              ) : (
+                                <span>Selecione uma data</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <SheetClose asChild>
               <Button className="bg-[#584380] text-white hover:bg-[#8c78ba] cursor-pointer" type="submit">
                 {transaction ? 'Salvar alterações' : 'Criar transação'}
