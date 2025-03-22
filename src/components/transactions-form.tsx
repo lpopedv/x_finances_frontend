@@ -240,8 +240,8 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Transação fixa</FormLabel>
+                    <div className="mt-1">
+                      <FormLabel>fixa?</FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -259,8 +259,8 @@ export const TransactionsForm = ({ transaction }: TransactionsFormProps) => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Transação paga</FormLabel>
+                    <div className="mt-1">
+                      <FormLabel>Já paga?</FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
