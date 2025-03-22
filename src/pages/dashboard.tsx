@@ -3,7 +3,7 @@ import { formatPriceInReais } from "../utils"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import { Minus } from "lucide-react"
 import { ExpensesByCategoryChart } from "~/components/expenses-by-category-chart"
-import { DashboardRequests } from "~/requests/chart"
+import { DashboardRequests } from "~/requests/dashboard-request"
 
 export const Dashboard = () => {
   const { data: dashboardData } = useQuery({

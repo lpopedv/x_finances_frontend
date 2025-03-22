@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart"
-import { DashboardRequests } from "~/requests/chart"
+import { DashboardRequests } from "~/requests/dashboard-request"
 
 const chartConfig = {
   spent: {
