@@ -16,7 +16,7 @@ export const transactionsColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "category",
     header: "Categoria",
-    cell: ({ row }) => row.original.category_id
+    cell: ({ row }) => row.original.category?.title
   },
   {
     accessorKey: "movement",

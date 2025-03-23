@@ -23,8 +23,6 @@ export const CategoriesForm = ({ category }: CategoriesFormProps) => {
     }
   });
 
-  console.log(category)
-
   const queryClient = useQueryClient()
 
   const createCategoryMutation = useMutation({
